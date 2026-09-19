@@ -21,12 +21,12 @@
 
 | category | tools |
 |----------|-------|
-| **🐛 discord** | webhook spam/delete · token tools · account nuker · server info · bot invite gen · selfbot (40+ commands) · server cloner · nuke bot · username checker · token checker · guild backup · message logger · voice spam |
-| **🔍 osint** | ip geo + port scan · reverse dns · **ai image geolocation** (picarta) · exif extract · 40-site username search · email registration check · phone carrier lookup · dns (a/mx/txt/ns/cname) · whois · subdomain enum · ssl cert transparency · shodan/censys search · wayback machine · breach check · dark web indexes · google dorks |
-| **💀 malicious** | email bomber · crypto clipper · vuln scanner · stress tester · browser stealer · keylogger · rat builder · wallet brute · reverse shell (multiple formats) · phishing pages · persistence · av evasion tips · c2 server · botnet stub · ransom sim |
-| **🎮 roblox** | user info · cookie validation · cookie login · group info · asset download · name history · username checker · cookie refresher · game info · inventory dump · trade scanner · limited sniper · group cloner · bot follower |
-| **⚙ sys/gen** | base64 codec · system info · ip pinger · python obfuscator · metadata scan · app info · config · defender exclusion · **windows debloater** · proxy scraper · proxy checker · registry editor · service manager · startup manager · file shredder · password gen · hash cracker · port forward · packet sniffer · wifi scanner |
-| **🎭 simulators** | fake token gen · fake mail · fake identity · fake credit card · social botter · fake paypal otp · fake fortnite · fake exodus · hacker terminal · fake bruteforcer · qr code gen · fake discord/steam/instagram logins |
+| **discord** | webhook spam/delete · token tools · account nuker · server info · bot invite gen · selfbot (40+ commands) · server cloner · nuke bot · username checker · token checker · guild backup · message logger · voice spam |
+| **osint** | ip geo + port scan · reverse dns · **ai image geolocation** (picarta) · exif extract · 40-site username search · email registration check · phone carrier lookup · dns (a/mx/txt/ns/cname) · whois · subdomain enum · ssl cert transparency · shodan/censys search · wayback machine · breach check · dark web indexes · google dorks |
+| **malicious** | email bomber · crypto clipper · vuln scanner · stress tester · browser stealer · keylogger · rat builder · wallet brute · reverse shell (multiple formats) · phishing pages · persistence · av evasion tips · c2 server · botnet stub · ransom sim |
+| **roblox** | user info · cookie validation · cookie login · group info · asset download · name history · username checker · cookie refresher · game info · inventory dump · trade scanner · limited sniper · group cloner · bot follower |
+| **sys/gen** | base64 codec · system info · ip pinger · python obfuscator · metadata scan · app info · config · defender exclusion · **windows debloater** · proxy scraper · proxy checker · registry editor · service manager · startup manager · file shredder · password gen · hash cracker · port forward · packet sniffer · wifi scanner |
+| **simulators** | fake token gen · fake mail · fake identity · fake credit card · social botter · fake paypal otp · fake fortnite · fake exodus · hacker terminal · fake bruteforcer · qr code gen · fake discord/steam/instagram logins |
 
 ---
 
