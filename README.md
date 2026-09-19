@@ -9,7 +9,7 @@
 [![License](https://img.shields.io/badge/License-MIT-00ffcc?style=for-the-badge)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0.0-00ffcc?style=for-the-badge)]()
 
-*one binary. sixty tools. zero friction.*
+*toolkit for recon.*
 
 *discord: https://discord.gg/GustAS9SGY*
 
@@ -134,6 +134,6 @@ mit — do what you want.
 
 **made by [seventycs](https://github.com/YOUR_USERNAME)**
 
-*because every hacker needs a good toolkit.*
+*for every hacker that needs a good toolkit.*
 
 </div>
