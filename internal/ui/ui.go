@@ -2,12 +2,13 @@ package ui
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
+	"time"
 	"unicode/utf8"
-        "time"
 
 	"golang.org/x/term"
 )
@@ -27,12 +28,10 @@ var (
 	categories   []Category
 	currentCat   int
 	currentPage  int
-	itemsPerPage = 14
+	itemsPerPage = 9
 )
 
-func RegisterCategory(c Category) {
-	categories = append(categories, c)
-}
+func RegisterCategory(c Category) { categories = append(categories, c) }
 
 func CurrentCategory() *Category {
 	if currentCat < 0 || currentCat >= len(categories) {
@@ -55,9 +54,7 @@ func CategoryLeft() {
 		currentCat = len(categories) - 1
 	}
 	currentPage = 0
-	Clear()
-	PrintBanner()
-	RenderMainMenu()
+	redraw()
 }
 
 func CategoryRight() {
@@ -66,15 +63,14 @@ func CategoryRight() {
 		currentCat = 0
 	}
 	currentPage = 0
-	Clear()
-	PrintBanner()
-	RenderMainMenu()
+	redraw()
 }
 
 func PagePrev() {
 	if currentPage > 0 {
 		currentPage--
 	}
+	redraw()
 }
 
 func PageNext() {
@@ -86,6 +82,50 @@ func PageNext() {
 	if currentPage < maxPage {
 		currentPage++
 	}
+	redraw()
+}
+
+func redraw() {
+	Clear()
+	PrintBanner()
+	RenderMainMenu()
+}
+
+// ---------- ansi helpers ----------
+
+func stripANSI(s string) string {
+	var b strings.Builder
+	inEsc := false
+	for _, r := range s {
+		if r == 0x1b {
+			inEsc = true
+			continue
+		}
+		if inEsc {
+			if r == 'm' {
+				inEsc = false
+			}
+			continue
+		}
+		b.WriteRune(r)
+	}
+	return b.String()
+}
+
+func visLen(s string) int { return utf8.RuneCountInString(stripANSI(s)) }
+
+func termWidth() int {
+	w, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil || w <= 0 {
+		return 100
+	}
+	if w < 70 {
+		w = 70
+	}
+	if w > 130 {
+		w = 130
+	}
+	return w
 }
 
 const bannerArt = ` ██████╗ ██╗  ██╗ ██████╗ ███████╗████████╗██╗     ██╗███╗   ██╗███████╗
@@ -95,72 +135,67 @@ const bannerArt = ` ██████╗ ██╗  ██╗ █████�
 ╚██████╔╝██║  ██║╚██████╔╝███████║   ██║   ███████╗██║██║ ╚████║███████╗
  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝`
 
-func termWidth() int {
-	w, _, err := term.GetSize(int(os.Stdout.Fd()))
-	if err != nil || w <= 0 {
-		return 120
+// ---------- startup ----------
+
+func Startup() {
+	Clear()
+	for i := 0; i < 4; i++ {
+		Clear()
+		fmt.Println(glitch(bannerArt, i))
+		time.Sleep(time.Duration(40+i*15) * time.Millisecond)
 	}
-	return w
+	Clear()
+	fmt.Println()
+	fmt.Println(NeonGreen(bannerArt))
+	fmt.Println()
+	fmt.Println("            " + DimCyan("advanced multi-tool   ·   v1.0   ·   made by seventycs"))
+	fmt.Println()
+	time.Sleep(300 * time.Millisecond)
+	fmt.Println("            " + Border("──────────────────────────────────────────────────────────────"))
+	time.Sleep(1400 * time.Millisecond)
 }
 
-func centerBlock(s string, w int) string {
-	var out strings.Builder
-	for _, line := range strings.Split(s, "\n") {
-		trimmed := strings.TrimRight(line, " \t")
-		vis := utf8.RuneCountInString(trimmed)
-		if vis >= w {
-			out.WriteString(line)
-			out.WriteString("\n")
-			continue
+func glitch(art string, n int) string {
+	out := []rune(art)
+	glyphs := []rune{'░', '▒', '▓', '█', '/', '\\', '|', '·', '+', '*'}
+	count := 15 + n*30
+	for i := 0; i < count; i++ {
+		idx := rand.Intn(len(out))
+		if out[idx] != '\n' && out[idx] != ' ' {
+			out[idx] = glyphs[rand.Intn(len(glyphs))]
 		}
-		pad := (w - vis) / 2
-		out.WriteString(strings.Repeat(" ", pad))
-		out.WriteString(line)
-		out.WriteString("\n")
 	}
-	return out.String()
+	switch n % 3 {
+	case 0:
+		return Green(string(out))
+	case 1:
+		return Cyan(string(out))
+	default:
+		return NeonGreen(string(out))
+	}
 }
 
-func centerLine(s string, w int) string {
-	vis := utf8.RuneCountInString(s)
-	if vis >= w {
-		return s
-	}
-	return strings.Repeat(" ", (w-vis)/2) + s
-}
+// ---------- header ----------
+
 func PrintBanner() {
 	w := termWidth()
-	fmt.Print(NeonGreen(centerBlock(bannerArt, w)))
+
 	fmt.Println()
-	bar := "──────────────────────────────────────────────────────────────────────────────"
-	fmt.Println(DimCyan(centerLine(bar, w)))
-	fmt.Println(Cyan(centerLine("advanced multi-tool  ·  v1.0  ·  made by seventycs", w)))
-	fmt.Println(DimCyan(centerLine(bar, w)))
+	fmt.Println(NeonGreen(bannerArt))
 	fmt.Println()
-}"──────────────────────────────────────────────────────────────────────────────"
-	fmt.Println(DimCyan(centerLine(bar, w)))
-	fmt.Println(Cyan(centerLine("advanced multi-tool  ·  v1.0  ·  made by seventycs", w)))
-	fmt.Println(DimCyan(centerLine(bar, w)))
+
+	left := "  " + DimCyan("advanced multi-tool")
+	right := DimCyan("v1.0  ·  made by seventycs") + "  "
+	gap := w - visLen(left) - visLen(right)
+	if gap < 1 {
+		gap = 1
+	}
+	fmt.Println(left + strings.Repeat(" ", gap) + right)
+	fmt.Println(DimCyan("  " + strings.Repeat("─", w-4)))
 	fmt.Println()
 }
 
-func paginationDots(current, total int) string {
-	if total <= 1 {
-		return ""
-	}
-	var b strings.Builder
-	for i := 0; i < total; i++ {
-		if i == current {
-			b.WriteString(NeonGreen("●"))
-		} else {
-			b.WriteString(DimCyan("○"))
-		}
-		if i < total-1 {
-			b.WriteString(" ")
-		}
-	}
-	return b.String()
-}
+// ---------- main menu ----------
 
 func RenderMainMenu() {
 	c := CurrentCategory()
@@ -169,23 +204,28 @@ func RenderMainMenu() {
 	}
 	w := termWidth()
 
-		// category pills
-	var tabs []string
-	for i, cat := range categories {
-		name := strings.ToUpper(cat.Name)
-		if i == currentCat {
-			tabs = append(tabs, NeonGreen("▐ ")+Green("\033[1m"+name+"\033[0m")+NeonGreen(" ▌"))
-		} else {
-			tabs = append(tabs, DimCyan(name))
-		}
-	}
-	fmt.Println(centerLine(strings.Join(tabs, "  "), w))
+	// category pills
+	fmt.Println("  " + renderCategories())
+	fmt.Println()
+	fmt.Println(DimCyan("  " + strings.Repeat("┄", w-4)))
 	fmt.Println()
 
 	// section title
-	fmt.Println(centerLine(NeonGreen("─── ")+Green(strings.ToUpper(c.Name))+NeonGreen(" ───"), w))
+	maxPage := (len(c.Items) - 1) / itemsPerPage
+	if maxPage < 0 {
+		maxPage = 0
+	}
+	title := strings.ToUpper(c.Name)
+	page := fmt.Sprintf("%d / %d", currentPage+1, maxPage+1)
+	titleLine := "  " + NeonGreen("◈ ") + "\033[1;92m" + title + "\033[0m"
+	gap := w - visLen(titleLine) - visLen(page) - 4
+	if gap < 1 {
+		gap = 1
+	}
+	fmt.Println(titleLine + strings.Repeat(" ", gap) + DimCyan(page) + "  ")
 	fmt.Println()
 
+	// items — 2-line format
 	start := currentPage * itemsPerPage
 	end := start + itemsPerPage
 	if end > len(c.Items) {
@@ -194,35 +234,56 @@ func RenderMainMenu() {
 
 	for i := start; i < end; i++ {
 		item := c.Items[i]
-		num := fmt.Sprintf("[%02d]", i)
-		line := fmt.Sprintf("%s  %-32s %s %s",
-			Green(num),
-			item.Name,
-			DimCyan("─"),
-			White(item.Desc),
-		)
-		fmt.Println(centerLine(line, w))
+		num := fmt.Sprintf("%02d", i)
+
+		// line 1: "   ##  NAME"
+		nameUpper := strings.ToUpper(item.Name)
+		line1 := "   " + Cyan(num) + "    " + "\033[1;97m" + nameUpper + "\033[0m"
+		fmt.Println(line1)
+
+		// line 2: "       description"
+		line2 := "         " + DimCyan(item.Desc)
+		fmt.Println(line2)
+
+		// blank spacer between items (except last)
+		if i < end-1 {
+			fmt.Println()
+		}
 	}
 	fmt.Println()
 
-	maxPage := (len(c.Items) - 1) / itemsPerPage
-	bar := "──────────────────────────────────────────────────────────────────────────────"
-	fmt.Println(DimCyan(centerLine(bar, w)))
-	dots := paginationDots(currentPage, maxPage+1)
-	if dots != "" {
-		fmt.Println(centerLine(dots, w))
+	// footer
+	fmt.Println(DimCyan("  " + strings.Repeat("─", w-4)))
+	footer := "  " + Green("[A/D]") + " " + DimCyan("category") + "    " +
+		Green("[P/N]") + " " + DimCyan("page") + "    " +
+		Green("[#]") + " " + DimCyan("run") + "    " +
+		Green("[99]") + " " + DimCyan("exit")
+	fmt.Println(footer)
+	fmt.Println()
+}
+
+func renderCategories() string {
+	var parts []string
+	for i, c := range categories {
+		name := strings.ToUpper(c.Name)
+		if i == currentCat {
+			parts = append(parts, "\033[1;92m▐ "+name+" ▌\033[0m")
+		} else {
+			parts = append(parts, DimCyan(name))
+		}
 	}
-	footer := fmt.Sprintf("%s %s   %s %s   %s %s   %s %s",
-		Green("[P/N]"), DimCyan("page"),
-		Green("[A/D]"), DimCyan("category"),
-		Green("[#]"),   DimCyan("run"),
-		Green("[99]"),  DimCyan("exit"),
-	)
-	fmt.Println(centerLine(footer, w))
-	if dots != "" {
-		fmt.Println(centerLine(fmt.Sprintf("%s page %d/%d", DimCyan("·"), currentPage+1, maxPage+1), w))
-	}
-	fmt.Println(DimCyan(centerLine(bar, w)))
+	return strings.Join(parts, "   ")
+}
+
+// ---------- tool screen ----------
+
+func Screen(title, desc string) {
+	w := termWidth()
+	fmt.Println()
+	fmt.Println("  " + NeonGreen("◈ ") + "\033[1;92m" + strings.ToUpper(title) + "\033[0m")
+	fmt.Println("  " + DimCyan(desc))
+	fmt.Println(DimCyan("  " + strings.Repeat("─", w-4)))
+	fmt.Println()
 }
 
 func Clear() {
@@ -235,26 +296,16 @@ func Clear() {
 	}
 }
 
+// ---------- colors ----------
+
 func Green(s string) string     { return "\033[92m" + s + "\033[0m" }
 func NeonGreen(s string) string { return "\033[38;5;46m" + s + "\033[0m" }
 func Cyan(s string) string      { return "\033[96m" + s + "\033[0m" }
-func DimCyan(s string) string   { return "\033[38;5;30m" + s + "\033[0m" }
+func DimCyan(s string) string   { return "\033[38;5;65m" + s + "\033[0m" }
 func White(s string) string     { return "\033[97m" + s + "\033[0m" }
 func Red(s string) string       { return "\033[91m" + s + "\033[0m" }
 func Yellow(s string) string    { return "\033[93m" + s + "\033[0m" }
+func Border(s string) string    { return "\033[38;5;29m" + s + "\033[0m" }
 
-// AnimatedBanner draws the banner line-by-line for a startup effect.
-func AnimatedBanner() {
-	w := termWidth()
-	lines := strings.Split(bannerArt, "\n")
-	for _, line := range lines {
-		fmt.Println(NeonGreen(centerLine(line, w)))
-		time.Sleep(15 * time.Millisecond)
-	}
-	fmt.Println()
-	bar := "──────────────────────────────────────────────────────────────────────────────"
-	fmt.Println(DimCyan(centerLine(bar, w)))
-	fmt.Println(Cyan(centerLine("advanced multi-tool  ·  v1.0  ·  made by seventycs", w)))
-	fmt.Println(DimCyan(centerLine(bar, w)))
-	fmt.Println()
-}
+// AnimatedBanner kept for main.go compat.
+func AnimatedBanner() { PrintBanner() }
