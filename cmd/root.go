@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
 	"ghostline/internal/ui"
 )
@@ -18,18 +17,20 @@ func Run() {
 	ui.RenderMainMenu()
 
 	for {
-		choice := prompt("ghostline")
-		switch choice {
+		fmt.Printf("\n%s@%s:~# ", ui.Green("ghostline"), ui.Cyan(ui.CurrentCategoryName()))
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+
+		switch input {
+		case "":
+			// empty enter — redraw and continue
+			ui.Clear()
+			ui.PrintBanner()
+			ui.RenderMainMenu()
 		case "a", "A":
 			ui.CategoryLeft()
-			ui.Clear()
-			ui.PrintBanner()
-			ui.RenderMainMenu()
 		case "d", "D":
 			ui.CategoryRight()
-			ui.Clear()
-			ui.PrintBanner()
-			ui.RenderMainMenu()
 		case "p", "P":
 			ui.PagePrev()
 			ui.Clear()
@@ -45,15 +46,12 @@ func Run() {
 			ui.Cyan("closing session. stay ghost.")
 			os.Exit(0)
 		default:
-			handleCategoryChoice(choice)
+			handleCategoryChoice(input)
+			ui.Clear()
+			ui.PrintBanner()
+			ui.RenderMainMenu()
 		}
 	}
-}
-
-func prompt(prefix string) string {
-	fmt.Printf("\n%s@%s:~# ", ui.Green(prefix), ui.Cyan(ui.CurrentCategoryName()))
-	input, _ := reader.ReadString('\n')
-	return strings.TrimSpace(input)
 }
 
 func handleCategoryChoice(choice string) {
@@ -62,31 +60,34 @@ func handleCategoryChoice(choice string) {
 		ui.Red("invalid category")
 		return
 	}
-	if idx, err := parseInt(choice); err == nil {
-		if idx >= 0 && idx < len(cat.Items) {
-			item := cat.Items[idx]
-			// brief loading transition
-			ui.Transition("loading "+item.Name+"...", 300*time.Millisecond)
-			ui.Clear()
-			ui.PrintBanner()
-			ui.Cyan("─── " + item.Name + " ───")
-			ui.White(item.Desc)
-			fmt.Println()
-			item.Handler()
-			pause()
-			ui.Clear()
-			ui.PrintBanner()
-			ui.RenderMainMenu()
-			return
-		}
+	idx, err := parseInt(choice)
+	if err != nil || idx < 0 || idx >= len(cat.Items) {
+		ui.Red("unknown command: " + choice)
+		pause()
+		return
 	}
-	ui.Red("unknown command: " + choice)
+
+	item := cat.Items[idx]
+
+		// enter tool screen
+	ui.Clear()
+	ui.PrintBanner()
+	ui.Screen(item.Name, item.Desc)
+
+	// run the tool
+	item.Handler()
+
+	// done prompt — obvious and pushed to bottom
 	pause()
 }
 
 func pause() {
-	fmt.Print("\n")
-	ui.DimCyan("press enter to continue...")
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println(ui.Green("  ═══════════════════════════════════════════════════════════════"))
+	fmt.Println(ui.Green("     ✓  done  ·  press ENTER to return to menu"))
+	fmt.Println(ui.Green("  ═══════════════════════════════════════════════════════════════"))
 	reader.ReadString('\n')
 }
 

@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"strings"
 	"unicode/utf8"
+        "time"
 
 	"golang.org/x/term"
 )
@@ -127,12 +128,16 @@ func centerLine(s string, w int) string {
 	}
 	return strings.Repeat(" ", (w-vis)/2) + s
 }
-
 func PrintBanner() {
 	w := termWidth()
 	fmt.Print(NeonGreen(centerBlock(bannerArt, w)))
 	fmt.Println()
 	bar := "──────────────────────────────────────────────────────────────────────────────"
+	fmt.Println(DimCyan(centerLine(bar, w)))
+	fmt.Println(Cyan(centerLine("advanced multi-tool  ·  v1.0  ·  made by seventycs", w)))
+	fmt.Println(DimCyan(centerLine(bar, w)))
+	fmt.Println()
+}"──────────────────────────────────────────────────────────────────────────────"
 	fmt.Println(DimCyan(centerLine(bar, w)))
 	fmt.Println(Cyan(centerLine("advanced multi-tool  ·  v1.0  ·  made by seventycs", w)))
 	fmt.Println(DimCyan(centerLine(bar, w)))
@@ -164,16 +169,17 @@ func RenderMainMenu() {
 	}
 	w := termWidth()
 
-	// category tabs
+		// category pills
 	var tabs []string
 	for i, cat := range categories {
+		name := strings.ToUpper(cat.Name)
 		if i == currentCat {
-			tabs = append(tabs, "\033[1;92m▶ "+strings.ToUpper(cat.Name)+" ◀\033[0m")
+			tabs = append(tabs, NeonGreen("▐ ")+Green("\033[1m"+name+"\033[0m")+NeonGreen(" ▌"))
 		} else {
-			tabs = append(tabs, DimCyan(strings.ToUpper(cat.Name)))
+			tabs = append(tabs, DimCyan(name))
 		}
 	}
-	fmt.Println(centerLine(strings.Join(tabs, DimCyan("  ·  ")), w))
+	fmt.Println(centerLine(strings.Join(tabs, "  "), w))
 	fmt.Println()
 
 	// section title
@@ -236,3 +242,19 @@ func DimCyan(s string) string   { return "\033[38;5;30m" + s + "\033[0m" }
 func White(s string) string     { return "\033[97m" + s + "\033[0m" }
 func Red(s string) string       { return "\033[91m" + s + "\033[0m" }
 func Yellow(s string) string    { return "\033[93m" + s + "\033[0m" }
+
+// AnimatedBanner draws the banner line-by-line for a startup effect.
+func AnimatedBanner() {
+	w := termWidth()
+	lines := strings.Split(bannerArt, "\n")
+	for _, line := range lines {
+		fmt.Println(NeonGreen(centerLine(line, w)))
+		time.Sleep(15 * time.Millisecond)
+	}
+	fmt.Println()
+	bar := "──────────────────────────────────────────────────────────────────────────────"
+	fmt.Println(DimCyan(centerLine(bar, w)))
+	fmt.Println(Cyan(centerLine("advanced multi-tool  ·  v1.0  ·  made by seventycs", w)))
+	fmt.Println(DimCyan(centerLine(bar, w)))
+	fmt.Println()
+}

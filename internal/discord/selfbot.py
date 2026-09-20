@@ -19,7 +19,7 @@ TOKEN_FILE = os.path.join(os.environ.get("TEMP", "/tmp"), ".selfbot_token")
 PREFIX = "+"
 
 # no intents needed for selfbots with discord.py-self
-bot = commands.Bot(command_prefix=PREFIX, self_bot=True)
+bot = commands.Bot(command_prefix=PREFIX, self_bot=True, help_command=None)
 
 def load_token():
     if os.path.exists(TOKEN_FILE):

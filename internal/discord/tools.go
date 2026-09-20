@@ -18,49 +18,105 @@ import (
 const apiBase = "https://discord.com/api/v10"
 
 func WebhookTools() {
-    ui.Cyan("enter webhook URL:")
-    var hook string
-    fmt.Scanln(&hook)
-    hook = strings.TrimSpace(hook)
+	var hook string
 
-    for {
-        ui.Clear()
-        ui.Green("webhook tools")
-        fmt.Println("  [1] send message")
-        fmt.Println("  [2] spam messages")
-        fmt.Println("  [3] delete webhook")
-        fmt.Println("  [4] get webhook info")
-        fmt.Println("  [99] back")
-        fmt.Print("\nchoice: ")
-        var c string
-        fmt.Scanln(&c)
-        switch c {
-        case "1":
-            fmt.Print("message: ")
-            var m string
-            fmt.Scanln(&m)
-            sendWebhook(hook, m, 1, 0)
-        case "2":
-            fmt.Print("message: ")
-            var m string
-            fmt.Scanln(&m)
-            fmt.Print("count: ")
-            var n int
-            fmt.Scanln(&n)
-            fmt.Print("delay ms: ")
-            var d int
-            fmt.Scanln(&d)
-            sendWebhook(hook, m, n, time.Duration(d)*time.Millisecond)
-        case "3":
-            deleteWebhook(hook)
-        case "4":
-            getWebhookInfo(hook)
-        case "99":
-            return
-        }
-        fmt.Print("\nenter to continue...")
-        fmt.Scanln()
-    }
+	for {
+		ui.Clear()
+		ui.PrintBanner()
+		ui.Screen("webhook tools", "spam, inspect, or delete discord webhooks")
+
+		if hook == "" {
+			fmt.Println("  " + ui.DimCyan("no webhook set"))
+		} else {
+			shown := hook
+			if len(shown) > 60 {
+				shown = shown[:57] + "..."
+			}
+			fmt.Println("  " + ui.DimCyan("current: ") + ui.Green(shown))
+		}
+		fmt.Println()
+		fmt.Println("  " + ui.Green("[1]") + "  set webhook url")
+		fmt.Println("  " + ui.Green("[2]") + "  send message")
+		fmt.Println("  " + ui.Green("[3]") + "  spam messages")
+		fmt.Println("  " + ui.Green("[4]") + "  delete webhook")
+		fmt.Println("  " + ui.Green("[5]") + "  get webhook info")
+		fmt.Println("  " + ui.Green("[99]") + " back to menu")
+		fmt.Println()
+		fmt.Print("  " + ui.Cyan("choice: "))
+
+		var c string
+		fmt.Scanln(&c)
+		c = strings.TrimSpace(c)
+
+		switch c {
+		case "1":
+			fmt.Print("  webhook url: ")
+			var h string
+			fmt.Scanln(&h)
+			hook = strings.TrimSpace(h)
+			ui.Green("  saved.")
+			time.Sleep(500 * time.Millisecond)
+
+		case "2":
+			if hook == "" {
+				ui.Red("  set the webhook url first")
+				time.Sleep(800 * time.Millisecond)
+				continue
+			}
+			fmt.Print("  message: ")
+			var m string
+			fmt.Scanln(&m)
+			sendWebhook(hook, m, 1, 0)
+			fmt.Println()
+			fmt.Print("  " + ui.DimCyan("press enter..."))
+			fmt.Scanln()
+
+		case "3":
+			if hook == "" {
+				ui.Red("  set the webhook url first")
+				time.Sleep(800 * time.Millisecond)
+				continue
+			}
+			fmt.Print("  message: ")
+			var m string
+			fmt.Scanln(&m)
+			fmt.Print("  count: ")
+			var n int
+			fmt.Scanln(&n)
+			fmt.Print("  delay ms: ")
+			var d int
+			fmt.Scanln(&d)
+			sendWebhook(hook, m, n, time.Duration(d)*time.Millisecond)
+			fmt.Println()
+			fmt.Print("  " + ui.DimCyan("press enter..."))
+			fmt.Scanln()
+
+		case "4":
+			if hook == "" {
+				ui.Red("  set the webhook url first")
+				time.Sleep(800 * time.Millisecond)
+				continue
+			}
+			deleteWebhook(hook)
+			hook = ""
+			fmt.Print("  " + ui.DimCyan("press enter..."))
+			fmt.Scanln()
+
+		case "5":
+			if hook == "" {
+				ui.Red("  set the webhook url first")
+				time.Sleep(800 * time.Millisecond)
+				continue
+			}
+			getWebhookInfo(hook)
+			fmt.Println()
+			fmt.Print("  " + ui.DimCyan("press enter..."))
+			fmt.Scanln()
+
+		case "99":
+			return
+		}
+	}
 }
 
 func sendWebhook(hook, msg string, count int, delay time.Duration) {
@@ -108,43 +164,76 @@ func getWebhookInfo(hook string) {
 }
 
 func TokenTools() {
-    ui.Cyan("enter discord token:")
-    var tok string
-    fmt.Scanln(&tok)
-    tok = strings.TrimSpace(tok)
+	var tok string
 
-    for {
-        ui.Clear()
-        ui.Green("token tools")
-        fmt.Println("  [1] validate token")
-        fmt.Println("  [2] get account info")
-        fmt.Println("  [3] list guilds")
-        fmt.Println("  [4] nuke account (delete DMs, leave servers)")
-        fmt.Println("  [5] change status")
-        fmt.Println("  [6] rotate token")
-        fmt.Println("  [99] back")
-        fmt.Print("\nchoice: ")
-        var c string
-        fmt.Scanln(&c)
-        switch c {
-        case "1":
-            validateToken(tok)
-        case "2":
-            accountInfo(tok)
-        case "3":
-            listGuilds(tok)
-        case "4":
-            nukeAccount(tok)
-        case "5":
-            setStatus(tok)
-        case "6":
-            rotateToken(tok)
-        case "99":
-            return
-        }
-        fmt.Print("\nenter to continue...")
-        fmt.Scanln()
-    }
+	for {
+		ui.Clear()
+		ui.PrintBanner()
+		ui.Screen("token tools", "validate, inspect, or destroy a discord account")
+
+		if tok == "" {
+			fmt.Println("  " + ui.DimCyan("no token set"))
+		} else {
+			shown := tok
+			if len(shown) > 60 {
+				shown = shown[:57] + "..."
+			}
+			fmt.Println("  " + ui.DimCyan("token: ") + ui.Green(shown))
+		}
+		fmt.Println()
+		fmt.Println("  " + ui.Green("[1]") + "  set token")
+		fmt.Println("  " + ui.Green("[2]") + "  validate token")
+		fmt.Println("  " + ui.Green("[3]") + "  account info")
+		fmt.Println("  " + ui.Green("[4]") + "  list guilds")
+		fmt.Println("  " + ui.Green("[5]") + "  change status")
+		fmt.Println("  " + ui.Green("[6]") + "  nuke account")
+		fmt.Println("  " + ui.Green("[99]") + " back")
+		fmt.Println()
+		fmt.Print("  " + ui.Cyan("choice: "))
+
+		var c string
+		fmt.Scanln(&c)
+		c = strings.TrimSpace(c)
+
+		switch c {
+		case "1":
+			fmt.Print("  token: ")
+			var t string
+			fmt.Scanln(&t)
+			tok = strings.TrimSpace(t)
+			fmt.Println("  " + ui.Green("saved."))
+			time.Sleep(400 * time.Millisecond)
+		case "2":
+			if tok == "" { fmt.Println("  " + ui.Red("set token first")); time.Sleep(700 * time.Millisecond); continue }
+			validateToken(tok)
+			pressEnter()
+		case "3":
+			if tok == "" { fmt.Println("  " + ui.Red("set token first")); time.Sleep(700 * time.Millisecond); continue }
+			accountInfo(tok)
+			pressEnter()
+		case "4":
+			if tok == "" { fmt.Println("  " + ui.Red("set token first")); time.Sleep(700 * time.Millisecond); continue }
+			listGuilds(tok)
+			pressEnter()
+		case "5":
+			if tok == "" { fmt.Println("  " + ui.Red("set token first")); time.Sleep(700 * time.Millisecond); continue }
+			setStatus(tok)
+			pressEnter()
+		case "6":
+			if tok == "" { fmt.Println("  " + ui.Red("set token first")); time.Sleep(700 * time.Millisecond); continue }
+			nukeAccount(tok)
+			pressEnter()
+		case "99":
+			return
+		}
+	}
+}
+
+func pressEnter() {
+	fmt.Println()
+	fmt.Print("  " + ui.DimCyan("press enter..."))
+	var s string
+	fmt.Scanln(&s)
 }
 
 func discordReq(method, path, token string, body interface{}) (*http.Response, error) {

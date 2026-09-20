@@ -10,6 +10,6 @@ func main() {
 	go updater.Check()
 	ui.Startup()
 	ui.Clear()
-	ui.PrintBanner()
+	ui.AnimatedBanner()
 	cmd.Run()
 }
